@@ -32,6 +32,7 @@
     overflow-y:auto; overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
   }
+  .page > * { flex-shrink:0; }
   .page.active{ opacity:1; transform:translateY(0); pointer-events:auto; }
 
   /* ===== Shared ===== */
@@ -156,6 +157,7 @@
   #page5 .tab-row{
     display:flex; border-radius:24px; overflow:hidden; margin:14px 0;
     border:2px solid rgba(200,170,120,.5); width:100%; max-width:300px;
+    flex-shrink:0; min-height:44px;
   }
   #page5 .tab-btn{
     flex:1; padding:12px 0; font-size:1em; cursor:pointer; background:rgba(20,15,10,.8);
