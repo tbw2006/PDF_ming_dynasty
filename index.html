@@ -152,17 +152,17 @@
   #page4 .era-card .era-desc{ font-size:.85em; opacity:.78; line-height:1.6; margin-top:4px; }
 
   /* ===== Page 5: Badges ===== */
-  #page5{ background:#131010; }
+  #page5{ background:#131010; padding-top:16px; }
   #page5 .tab-row{
-    display:flex; border-radius:20px; overflow:hidden; margin:10px 0;
-    border:1px solid rgba(200,170,120,.35);
+    display:flex; border-radius:24px; overflow:hidden; margin:14px 0;
+    border:2px solid rgba(200,170,120,.5); width:100%; max-width:300px;
   }
   #page5 .tab-btn{
-    padding:8px 20px; font-size:.9em; cursor:pointer; background:transparent;
-    color:#b8a080; border:none; transition:all .3s;
-    -webkit-tap-highlight-color:transparent;
+    flex:1; padding:12px 0; font-size:1em; cursor:pointer; background:rgba(20,15,10,.8);
+    color:#c8b090; border:none; transition:all .3s; font-weight:bold;
+    letter-spacing:.04em; -webkit-tap-highlight-color:transparent;
   }
-  #page5 .tab-btn.on{ background:rgba(180,120,50,.4); color:#f0e0c0; }
+  #page5 .tab-btn.on{ background:rgba(180,110,40,.55); color:#fff; }
   #page5 .grid{
     display:grid; grid-template-columns:repeat(3,1fr); gap:7px;
     width:100%; max-width:320px; margin:4px 0 8px;
@@ -669,9 +669,8 @@ function resetPortrait(){
   rankInput.value = 1;
   rankShow.textContent = '一品';
   document.getElementById('licheng').style.display = 'none';
-  page6.querySelectorAll('.id-tab-row .tab-btn').forEach(function(b){
-    b.classList.toggle('on', b.dataset.idt === 'civil');
-  });
+  document.getElementById('idt-civil').classList.add('on');
+  document.getElementById('idt-military').classList.remove('on');
   document.getElementById('robe-visual').style.background = robeColors[0];
   updatePortrait();
 }
