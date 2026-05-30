@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>中华衣冠奇遇记 — 补服篇</title>
+<style>
+  *,*::before,*::after{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ width:100%; height:100%; overflow:hidden; font-family:"Noto Serif SC","STSong","SimSun",serif; }
+  body{ background:#1a1410; }
+
+  /* ===== Music Toggle ===== */
+  #music-toggle{
+    position:fixed; top:12px; right:12px; z-index:1000;
+    width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.3);
+    background:rgba(0,0,0,.5); color:#e8d5b0; font-size:16px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+    transition:opacity .3s;
+  }
+  #music-toggle.off{ opacity:.45; }
+
+  /* ===== Container ===== */
+  #app{ position:relative; width:100%; height:100%; }
+
+  .page{
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transition:opacity .5s ease, transform .5s ease;
+    opacity:0; transform:translateY(24px); pointer-events:none;
+    padding:20px 24px; text-align:center; color:#e8d5b0;
+    overflow-y:auto; overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+  .page.active{ opacity:1; transform:translateY(0); pointer-events:auto; }
+
+  /* ===== Shared ===== */
+  .page .narration{ font-size:1.05em; line-height:1.8; max-width:300px; margin:12px 0; opacity:.85; }
+  .page .title-main{ font-size:1.5em; font-weight:bold; letter-spacing:.08em; margin-bottom:4px; }
+  .page .subtitle{ font-size:.9em; opacity:.65; margin-bottom:8px; }
+  .btn{
+    display:inline-block; padding:10px 26px; margin:6px;
+    border:1px solid rgba(200,175,130,.45); border-radius:22px;
+    background:rgba(110,55,28,.35); color:#e8d5b0; font-size:.9em;
+    cursor:pointer; letter-spacing:.05em; user-select:none;
+    transition:background .3s, border-color .3s, transform .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn:active{ transform:scale(.96); background:rgba(160,80,40,.55); border-color:#c8a870; }
+
+  /* ===== Page 1: Cover ===== */
+  #page1{ background:linear-gradient(180deg, #0d0d0d 0%, #1e1810 50%, #2a1a0e 100%); }
+  #page1 .cover-img-wrap{
+    width:85%; max-width:300px; aspect-ratio:3/4; margin:8px 0 12px;
+    border:1px solid rgba(200,170,120,.35); border-radius:10px; overflow:hidden;
+    position:relative;
+  }
+  #page1 .cover-img-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  #page1 .cover-title{
+    position:absolute; bottom:10%; left:50%; transform:translateX(-50%);
+    font-size:1.25em; font-weight:bold; letter-spacing:.1em; white-space:nowrap;
+    text-shadow:0 2px 8px rgba(0,0,0,.7);
+    animation:titleFadeIn 2.5s ease-out forwards;
+  }
+  @keyframes titleFadeIn{
+    0%{ opacity:0; transform:translateX(-50%) translateY(16px); }
+    100%{ opacity:1; transform:translateX(-50%) translateY(0); }
+  }
+  #page1 .click-hint{
+    font-size:.75em; opacity:.45; margin-top:4px;
+    animation:hintPulse 2s ease-in-out infinite;
+  }
+  @keyframes hintPulse{
+    0%,100%{ opacity:.3; } 50%{ opacity:.55; }
+  }
+
+  /* ===== Page 2: Dream ===== */
+  #page2{ background:linear-gradient(180deg, #060e1a 0%, #0f1f35 50%, #152540 100%); }
+  #page2 .dream-img-wrap{
+    width:80%; max-width:300px; aspect-ratio:4/3; margin:8px 0 16px;
+    border-radius:10px; overflow:hidden; position:relative;
+    box-shadow:0 0 60px rgba(180,150,100,.2);
+  }
+  #page2 .dream-img-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+  #page2 .gate-overlay{
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  #page2 .gate-glow{
+    width:80px; height:120px; border-radius:4px;
+    background:radial-gradient(ellipse, rgba(255,200,60,.4), rgba(180,100,30,.15), transparent);
+    animation:gateGlow 2s ease-in-out infinite;
+  }
+  @keyframes gateGlow{
+    0%,100%{ box-shadow:0 0 20px rgba(255,200,80,.3); }
+    50%{ box-shadow:0 0 50px rgba(255,200,80,.6); }
+  }
+  #page2 .click-hint{ font-size:.75em; opacity:.45; }
+
+  /* ===== Page 3: Structure ===== */
+  #page3{ background:#1f1912; }
+  #page3 .robe-wrap{
+    position:relative; width:220px; height:300px; margin:8px 0 12px;
+  }
+  #page3 .robe-wrap img{
+    width:100%; height:100%; object-fit:contain; border-radius:8px;
+    border:1px solid rgba(200,170,120,.3);
+  }
+  #page3 .hotspot{
+    position:absolute; width:26px; height:26px; border-radius:50%;
+    background:rgba(220,180,100,.55); border:2px solid #e0cfa0;
+    cursor:pointer; animation:dotPulse 2s ease-in-out infinite;
+    -webkit-tap-highlight-color:transparent;
+  }
+  @keyframes dotPulse{
+    0%,100%{ box-shadow:0 0 4px rgba(220,180,100,.3); }
+    50%{ box-shadow:0 0 16px rgba(220,180,100,.75); }
+  }
+  #page3 .hotspot-label{
+    position:absolute; font-size:.75em; white-space:nowrap;
+    color:#e8d5b0; background:rgba(0,0,0,.7); padding:2px 8px; border-radius:10px;
+    pointer-events:none;
+  }
+  #page3 .info-popup{
+    display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:rgba(20,15,10,.95); border:1px solid rgba(200,170,120,.5);
+    border-radius:10px; padding:16px 18px; font-size:.9em; max-width:260px;
+    text-align:center; line-height:1.7; z-index:200;
+    box-shadow:0 8px 32px rgba(0,0,0,.6);
+  }
+  #page3 .info-popup.show{ display:block; }
+  #page3 .btn-row{ margin-top:8px; }
+
+  /* ===== Page 4: History ===== */
+  #page4{ background:#1a140e; justify-content:flex-start; padding-top:28px; }
+  #page4 .scroll-wrap{
+    display:flex; overflow-x:auto; scroll-snap-type:x mandatory;
+    width:100%; max-width:400px; gap:10px; padding:8px 4px 12px;
+    -webkit-overflow-scrolling:touch;
+  }
+  #page4 .scroll-wrap::-webkit-scrollbar{ display:none; }
+  #page4 .era-card{
+    flex:0 0 78%; scroll-snap-align:center;
+    background:rgba(35,26,17,.85); border:1px solid rgba(200,170,120,.25);
+    border-radius:12px; padding:12px 14px 16px; text-align:center;
+  }
+  #page4 .era-card img{
+    width:100%; aspect-ratio:16/10; object-fit:cover; border-radius:8px; margin-bottom:8px;
+  }
+  #page4 .era-card .era-title{ font-size:1.1em; font-weight:bold; }
+  #page4 .era-card .era-desc{ font-size:.85em; opacity:.78; line-height:1.6; margin-top:4px; }
+
+  /* ===== Page 5: Badges ===== */
+  #page5{ background:#131010; }
+  #page5 .tab-row{
+    display:flex; border-radius:20px; overflow:hidden; margin:10px 0;
+    border:1px solid rgba(200,170,120,.35);
+  }
+  #page5 .tab-btn{
+    padding:8px 20px; font-size:.9em; cursor:pointer; background:transparent;
+    color:#b8a080; border:none; transition:all .3s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #page5 .tab-btn.on{ background:rgba(180,120,50,.4); color:#f0e0c0; }
+  #page5 .grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:7px;
+    width:100%; max-width:320px; margin:4px 0 8px;
+  }
+  #page5 .cell{
+    aspect-ratio:1; background:rgba(28,18,12,.7); border:1px solid rgba(200,170,120,.22);
+    border-radius:8px; cursor:pointer; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; overflow:hidden;
+    transition:transform .2s, border-color .2s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #page5 .cell:active{ transform:scale(.94); border-color:rgba(220,180,120,.5); }
+  #page5 .cell img{ width:75%; height:75%; object-fit:contain; }
+  #page5 .cell .rank-tag{ font-size:.65em; opacity:.6; margin-top:1px; }
+  #page5 .cell .ph{ font-size:2em; opacity:.35; display:none; }
+  #page5 .detail-overlay{
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,.88); z-index:500; flex-direction:column;
+    align-items:center; justify-content:center;
+  }
+  #page5 .detail-overlay.on{ display:flex; }
+  #page5 .detail-overlay img{ width:150px; height:150px; object-fit:contain; margin-bottom:14px; }
+  #page5 .detail-overlay .d-text{ font-size:1em; max-width:260px; text-align:center; line-height:1.8; }
+
+  /* ===== Page 6: Identity ===== */
+  #page6{ background:#1a150f; }
+  #page6 .id-tab-row{
+    display:flex; border-radius:20px; overflow:hidden; margin:10px 0;
+    border:1px solid rgba(200,170,120,.35);
+  }
+  #page6 .id-tab-row .tab-btn{
+    padding:8px 22px; font-size:.9em; cursor:pointer; background:transparent;
+    color:#b8a080; border:none; transition:all .3s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #page6 .id-tab-row .tab-btn.on{ background:rgba(180,120,50,.4); color:#f0e0c0; }
+  #page6 .slider-wrap{ width:100%; max-width:260px; margin:8px 0; }
+  #page6 .rank-txt{ font-size:.95em; margin-bottom:2px; }
+  #page6 .rank-txt strong{ color:#e8c870; }
+  #page6 input[type=range]{ width:100%; accent-color:#c8a060; }
+  /* Portrait */
+  #page6 .portrait{
+    position:relative; width:200px; height:280px; margin:8px 0 12px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  /* hat (乌纱帽) */
+  #page6 .wusha{
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:70px; height:44px; z-index:3;
+  }
+  #page6 .wusha .hat-top{
+    width:70px; height:8px; background:#1a1a1a; border-radius:4px 4px 0 0; margin:0 auto;
+  }
+  #page6 .wusha .hat-body{
+    width:64px; height:22px; background:linear-gradient(180deg, #1a1a1a, #2a2a2a);
+    margin:0 auto; border-radius:0 0 2px 2px;
+  }
+  #page6 .wusha .hat-wing{
+    position:absolute; top:12px; left:50%; transform:translateX(-50%);
+    width:90px; height:6px; background:#222; border-radius:3px;
+  }
+  /* robe */
+  #page6 .robe-visual{
+    width:110px; height:180px; border-radius:14px 14px 0 0;
+    transition:background .6s; position:relative; z-index:2;
+    border:1px solid rgba(0,0,0,.3);
+    box-shadow:inset 0 20px 40px rgba(255,255,255,.05);
+  }
+  /* badge on chest */
+  #page6 .badge-on-chest{
+    position:absolute; top:30px; left:50%; transform:translateX(-50%);
+    width:44px; height:44px; z-index:3;
+  }
+  #page6 .badge-on-chest img{ width:100%; height:100%; object-fit:contain; }
+  /* belt (革带) */
+  #page6 .gedai{
+    position:absolute; top:130px; left:50%; transform:translateX(-50%);
+    width:112px; height:14px; z-index:4;
+    background:linear-gradient(180deg, #3a2a10, #5a4020, #3a2a10);
+    border-radius:3px; border:1px solid rgba(200,160,80,.4);
+    box-shadow:0 2px 4px rgba(0,0,0,.4);
+  }
+  #page6 .gedai-buckle{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:18px; height:18px; background:radial-gradient(circle, #c8a040, #8b6914);
+    border-radius:50%; border:2px solid #6b5010;
+  }
+  #page6 .licheng{
+    display:none; font-size:1.3em; color:#e8b860; margin-top:6px;
+    letter-spacing:.12em;
+  }
+
+  /* ===== Page 7: Awakening ===== */
+  #page7{ background:linear-gradient(180deg, #221a10 0%, #33281a 55%, #423525 100%); }
+  #page7 .wake-img-wrap{
+    width:80%; max-width:300px; aspect-ratio:4/3; margin:8px 0 16px;
+    border-radius:10px; overflow:hidden;
+    border:1px solid rgba(200,170,120,.25);
+    animation:wakeFadeIn 1.5s ease-out;
+  }
+  @keyframes wakeFadeIn{
+    0%{ opacity:.4; filter:blur(4px); }
+    100%{ opacity:1; filter:blur(0); }
+  }
+  #page7 .wake-img-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  /* ===== Page 8: Credits ===== */
+  #page8{ background:#1a1410; justify-content:flex-start; padding-top:24px; }
+  #page8 .credit-sec{ text-align:left; max-width:320px; width:100%; margin:8px 0; }
+  #page8 .credit-sec h3{ font-size:.95em; border-bottom:1px solid rgba(200,170,120,.25); padding-bottom:3px; margin-bottom:6px; }
+  #page8 .credit-sec p,#page8 .credit-sec li{ font-size:.82em; opacity:.7; line-height:1.7; }
+  #page8 .credit-sec ul,#page8 .credit-sec ol{ padding-left:1.2em; }
+
+  /* ===== Nav overlay ===== */
+  #nav-arrows{
+    position:fixed; bottom:20px; left:0; right:0; z-index:100;
+    display:flex; justify-content:center; gap:16px; pointer-events:none;
+  }
+  #nav-arrows button{
+    pointer-events:auto; width:40px; height:40px; border-radius:50%;
+    border:1px solid rgba(255,255,255,.25); background:rgba(0,0,0,.45);
+    color:#e8d5b0; font-size:18px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    transition:opacity .3s; -webkit-tap-highlight-color:transparent;
+  }
+  #nav-arrows button:active{ background:rgba(100,60,30,.5); }
+  #nav-arrows button:first-child{ opacity:.5; }
+
+  /* dots */
+  #dots{
+    position:fixed; bottom:68px; left:50%; transform:translateX(-50%); z-index:100;
+    display:flex; gap:5px;
+  }
+  .dot{ width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.25); transition:all .3s; }
+  .dot.cur{ background:rgba(220,180,100,.85); width:14px; border-radius:3px; }
+
+  @media (min-width:768px){
+    .page{ padding:32px 48px; }
+    #page1 .cover-img-wrap{ max-width:360px; }
+    #page4 .scroll-wrap{ max-width:600px; }
+    #page6 .portrait{ width:240px; height:320px; }
+  }
+</style>
+</head>
+<body>
+
+<audio id="bgm" src="material/music.m4a" loop preload="auto"></audio>
+<button id="music-toggle" onclick="toggleMusic()" title="音乐">♪</button>
+
+<div id="dots"></div>
+<div id="nav-arrows">
+  <button onclick="prevPage()" id="btn-prev" title="上一页">▲</button>
+  <button onclick="nextPage()" id="btn-next" title="下一页">▼</button>
+</div>
+
+<div id="app">
+
+  <!-- ========== Page 1: Cover ========== -->
+  <div class="page active" id="page1" data-i="0">
+    <div class="cover-img-wrap">
+      <img src="material/photos/1.png" alt="封面">
+      <div class="cover-title">中华衣冠奇遇记——补服篇</div>
+    </div>
+    <p class="narration">那日街头，我与一件明代补服不期而遇。<br>一瞬间，仿佛有什么古老的东西，扣响了心门。</p>
+    <p class="click-hint">点击屏幕或按 ↓ 继续</p>
+  </div>
+
+  <!-- ========== Page 2: Dream ========== -->
+  <div class="page" id="page2" data-i="1">
+    <div class="dream-img-wrap">
+      <img src="material/photos/2.png" alt="入梦">
+      <div class="gate-overlay" onclick="openGate()">
+        <div class="gate-glow" id="gate-glow"></div>
+      </div>
+    </div>
+    <p class="narration">是夜，我沉入一场奇异的梦。一个声音说：<br>"来吧，推开这扇门，你会看见真正的衣裳。"</p>
+    <p class="click-hint">点击金光处推开大门</p>
+  </div>
+
+  <!-- ========== Page 3: Structure ========== -->
+  <div class="page" id="page3" data-i="2">
+    <h2 class="title-main">识·形</h2>
+    <p class="subtitle">补服的结构密码</p>
+    <div class="robe-wrap" id="robe-wrap">
+      <img src="material/photos/3.png" alt="明代补服">
+      <div class="hotspot" style="top:16%;left:42%;" data-pt="collar"></div>
+      <div class="hotspot-label" style="top:6%;left:30%;">圆领大襟</div>
+      <div class="hotspot" style="top:40%;left:50%;" data-pt="buzi"></div>
+      <div class="hotspot-label" style="top:48%;left:64%;">胸前补子</div>
+      <div class="hotspot" style="bottom:12%;left:80%;" data-pt="slit"></div>
+      <div class="hotspot-label" style="bottom:2%;left:68%;">两侧开衩</div>
+      <div class="info-popup" id="info-popup"></div>
+    </div>
+    <p class="narration">这便是明代官员的"工作服"——补服。<br>它的每一个部件，都是礼制的缩影。</p>
+    <div class="btn-row"><button class="btn" onclick="nextPage()">继续探索</button></div>
+  </div>
+
+  <!-- ========== Page 4: History ========== -->
+  <div class="page" id="page4" data-i="3">
+    <h2 class="title-main">寻·源</h2>
+    <p class="subtitle">补服的前世今生</p>
+    <div class="scroll-wrap">
+      <div class="era-card">
+        <img src="material/photos/4_1.png" alt="盛唐">
+        <div class="era-title">盛唐</div>
+        <div class="era-desc">萌芽：唐代绣袍，以纹饰区分尊卑。</div>
+      </div>
+      <div class="era-card">
+        <img src="material/photos/4_2.jpg" alt="明代">
+        <div class="era-title">明代·洪武朝</div>
+        <div class="era-desc">诞生：洪武二十四年，诏定补服制度，衣冠禽兽，自此而始。</div>
+      </div>
+      <div class="era-card">
+        <img src="material/photos/4_3.png" alt="清代">
+        <div class="era-title">清代</div>
+        <div class="era-desc">延续：清代沿用补服，补子略有变化，沿用至清末。</div>
+      </div>
+    </div>
+    <p class="narration">从一朵刺绣的演变，到一个王朝的背影。<br>补服的故事，要从一千多年前说起。</p>
+    <button class="btn" onclick="nextPage()">继续</button>
+  </div>
+
+  <!-- ========== Page 5: Badges ========== -->
+  <div class="page" id="page5" data-i="4">
+    <h2 class="title-main">观·禽</h2>
+    <p class="subtitle">补子里的"动物园"</p>
+    <div class="tab-row" id="page5-tabs">
+      <button class="tab-btn on" data-tab="civil">文官·飞禽</button>
+      <button class="tab-btn" data-tab="military">武官·走兽</button>
+    </div>
+    <div class="grid" id="badge-grid"></div>
+    <p class="narration">这便是"衣冠禽兽"的真相<br>——昔日荣耀的身份徽章。</p>
+    <button class="btn" onclick="nextPage()">为自己选一个身份</button>
+    <div class="detail-overlay" id="badge-detail-overlay">
+      <img id="detail-img" src="" alt="">
+      <div class="d-text" id="detail-text"></div>
+      <button class="btn" onclick="closeBadgeDetail()" style="margin-top:16px;">关闭</button>
+    </div>
+  </div>
+
+  <!-- ========== Page 6: Identity ========== -->
+  <div class="page" id="page6" data-i="5">
+    <h2 class="title-main">入·境</h2>
+    <p class="subtitle">生成你的大明身份</p>
+    <div class="id-tab-row">
+      <button class="tab-btn on" data-idt="civil">文官</button>
+      <button class="tab-btn" data-idt="military">武官</button>
+    </div>
+    <div class="slider-wrap">
+      <p class="rank-txt">品级：<strong id="rank-show">一品</strong></p>
+      <input type="range" min="1" max="9" value="1" id="rank-input">
+    </div>
+    <!-- Portrait: 乌纱帽 + 补服 + 补子 + 革带 -->
+    <div class="portrait">
+      <div class="wusha">
+        <div class="hat-wing"></div>
+        <div class="hat-top"></div>
+        <div class="hat-body"></div>
+      </div>
+      <div class="robe-visual" id="robe-visual"></div>
+      <div class="badge-on-chest" id="badge-on-chest"></div>
+      <div class="gedai"><div class="gedai-buckle"></div></div>
+    </div>
+    <p class="narration">选择你的身份与品级，<br>看看在大明，你会身着何等衣裳。</p>
+    <button class="btn" onclick="generateOutfit()">生成官服</button>
+    <p class="licheng" id="licheng">礼成</p>
+    <div style="margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+      <button class="btn" onclick="resetPortrait()" style="font-size:.8em;">再选一次</button>
+      <button class="btn" onclick="nextPage()" style="font-size:.8em;">结束梦境</button>
+    </div>
+  </div>
+
+  <!-- ========== Page 7: Awakening ========== -->
+  <div class="page" id="page7" data-i="6">
+    <h2 class="title-main">梦醒</h2>
+    <p class="subtitle">意犹未尽</p>
+    <div class="wake-img-wrap">
+      <img src="material/photos/7.png" alt="梦醒">
+    </div>
+    <p class="narration">大梦初醒，衣冠之魅犹在眼前。<br>原来，那些沉睡在历史中的服饰，从未真正离开我们。</p>
+    <button class="btn" onclick="nextPage()">进入终章</button>
+  </div>
+
+  <!-- ========== Page 8: Credits ========== -->
+  <div class="page" id="page8" data-i="7">
+    <h2 class="title-main">终章·文化回响</h2>
+    <div class="credit-sec">
+      <h3>核心基因来源</h3>
+      <ul>
+        <li>CN_Pattern_002 四合如意云纹</li>
+        <li>CN_Color_002 官绿</li>
+        <li>CN_Color_003 酱红</li>
+        <li>CN_Color_004 鸦青</li>
+        <li>CN_Emblem_001 仙鹤补子</li>
+      </ul>
+    </div>
+    <div class="credit-sec">
+      <h3>主要参考文献</h3>
+      <ol>
+        <li>张廷玉, 等. 明史: 卷六十七·舆服三[M]. 北京: 中华书局, 1974.</li>
+        <li>[明]申时行, 等. 大明会典: 卷六十一·冠服二[M]. 明万历十五年内府刻本.</li>
+      </ol>
+    </div>
+    <div class="credit-sec">
+      <h3>致谢</h3>
+      <p>感谢山东博物馆、中国丝绸博物馆等提供研究资源。</p>
+    </div>
+    <button class="btn" onclick="goToPage(0)" style="margin-top:8px;">重历梦境</button>
+  </div>
+
+</div>
+
+<script>
+// ==================== DATA ====================
+var civilBadges = [
+  {r:1,n:'仙鹤',m:'忠贞清正，位列台辅',f:'仙鹤.png'},
+  {r:2,n:'锦鸡',m:'文采斐然，祥瑞之兆',f:'锦鸡.png'},
+  {r:3,n:'孔雀',m:'仪表端庄，品行高洁',f:'孔雀.png'},
+  {r:4,n:'云雁',m:'志存高远，循礼有序',f:'云雁.png'},
+  {r:5,n:'白鹇',m:'洁身自好，清正廉明',f:'白鹇.png'},
+  {r:6,n:'鹭鸶',m:'风姿清雅，和睦安宁',f:'鹭鸶.png'},
+  {r:7,n:'鸂鶒',m:'忠贞不渝，刚正不阿',f:'鸂鶒.png'},
+  {r:8,n:'黄鹂',m:'言辞恳切，循循善诱',f:'黄鹂.png'},
+  {r:9,n:'鹌鹑',m:'安居乐业，踏实稳妥',f:'鹌鹑.png'}
+];
+
+var militaryBadges = [
+  {r:1,n:'狮子',m:'勇猛无畏，威慑四方',f:'狮子.png'},
+  {r:2,n:'狮子',m:'勇猛无畏，威慑四方',f:'狮子.png'},
+  {r:3,n:'老虎',m:'威猛刚毅，百兽之王',f:'老虎.png'},
+  {r:4,n:'豹子',m:'迅捷果敢，锐不可当',f:'豹子.png'},
+  {r:5,n:'熊罴',m:'力大无穷，勇武彪悍',f:'熊罴.png'},
+  {r:6,n:'彪',m:'骁勇善战，一往无前',f:'彪.png'},
+  {r:7,n:'彪',m:'骁勇善战，一往无前',f:'彪.png'},
+  {r:8,n:'犀牛',m:'坚不可摧，固若磐石',f:'犀牛.png'},
+  {r:9,n:'海马',m:'乘风破浪，开拓疆域',f:'海马.png'}
+];
+
+var robeColors = [
+  '#8b1a1a','#8b1a1a','#8b1a1a','#8b1a1a',  // 1-4 绯
+  '#2a4a6a','#2a4a6a','#2a4a6a',            // 5-7 青
+  '#3a5c36','#3a5c36'                        // 8-9 绿
+];
+var rankCN = ['','一','二','三','四','五','六','七','八','九'];
+
+// ==================== STATE ====================
+var cur = 0, total = 8;
+var badgeTab = 'civil';
+var idType = 'civil';
+var idRank = 1;
+var musicOn = false;
+
+// ==================== NAVIGATION ====================
+function goToPage(i){
+  if(i<0||i>=total) return;
+  var pages = document.querySelectorAll('.page');
+  pages[cur].classList.remove('active');
+  cur = i;
+  pages[cur].classList.add('active');
+  updateDots();
+  updateArrows();
+  if(!musicOn) tryMusic();
+}
+
+function nextPage(){ goToPage((cur+1)%total); }
+function prevPage(){ if(cur>0) goToPage(cur-1); }
+
+// ==================== DOTS ====================
+(function buildDots(){
+  var c = document.getElementById('dots');
+  for(var i=0;i<total;i++){
+    var d = document.createElement('span');
+    d.className = 'dot'+(i===0?' cur':'');
+    c.appendChild(d);
+  }
+})();
+function updateDots(){
+  var ds = document.querySelectorAll('#dots .dot');
+  for(var i=0;i<ds.length;i++) ds[i].className = 'dot'+(i===cur?' cur':'');
+}
+function updateArrows(){
+  document.getElementById('btn-prev').style.opacity = cur===0 ? '.2' : '.5';
+}
+
+// ==================== MUSIC ====================
+function tryMusic(){
+  document.getElementById('bgm').play().then(function(){
+    musicOn=true; document.getElementById('music-toggle').classList.remove('off');
+  }).catch(function(){});
+}
+function toggleMusic(){
+  var bgm = document.getElementById('bgm');
+  var btn = document.getElementById('music-toggle');
+  if(musicOn){ bgm.pause(); musicOn=false; btn.classList.add('off'); }
+  else{ bgm.play().then(function(){ musicOn=true; btn.classList.remove('off'); }).catch(function(){}); }
+}
+
+// ==================== PAGE 2: GATE ====================
+function openGate(){
+  var g = document.getElementById('gate-glow');
+  g.style.transform = 'scale(3)';
+  g.style.opacity = '1';
+  g.style.transition = 'all .8s ease';
+  setTimeout(function(){ nextPage(); }, 800);
+}
+
+// ==================== PAGE 3: HOTSPOTS ====================
+var hotspotTexts = {
+  collar:'圆领右衽，宽袖敞口，尽显庄重。',
+  buzi:'文官绣禽，武官绣兽，这是补服的灵魂所在。',
+  slit:'便于骑马行走，功能与礼仪并存。'
+};
+document.getElementById('robe-wrap').addEventListener('click', function(e){
+  var hs = e.target.closest('.hotspot');
+  if(hs){
+    e.stopPropagation();
+    var popup = document.getElementById('info-popup');
+    popup.textContent = hotspotTexts[hs.dataset.pt] || '';
+    popup.classList.add('show');
+  } else {
+    document.getElementById('info-popup').classList.remove('show');
+  }
+});
+
+// ==================== PAGE 5: BADGES ====================
+document.getElementById('page5-tabs').addEventListener('click', function(e){
+  var btn = e.target.closest('.tab-btn');
+  if(!btn) return;
+  var tab = btn.dataset.tab;
+  badgeTab = tab;
+  this.querySelectorAll('.tab-btn').forEach(function(b){
+    b.classList.toggle('on', b.dataset.tab === tab);
+  });
+  renderBadgeGrid();
+});
+
+function renderBadgeGrid(){
+  var list = badgeTab === 'civil' ? civilBadges : militaryBadges;
+  var html = '';
+  for(var i=0;i<list.length;i++){
+    var b = list[i];
+    html += '<div class="cell" data-tab="'+badgeTab+'" data-idx="'+i+'">'+
+      '<img src="material/photos/'+b.f+'" alt="'+b.n+'" loading="lazy" '+
+      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';">'+
+      '<span class="ph">'+b.n[0]+'</span>'+
+      '<span class="rank-tag">'+rankCN[b.r]+'品</span></div>';
+  }
+  document.getElementById('badge-grid').innerHTML = html;
+}
+
+document.getElementById('badge-grid').addEventListener('click', function(e){
+  var cell = e.target.closest('.cell');
+  if(!cell) return;
+  var tab = cell.dataset.tab;
+  var idx = parseInt(cell.dataset.idx);
+  var list = tab === 'civil' ? civilBadges : militaryBadges;
+  var b = list[idx];
+  document.getElementById('detail-img').src = 'material/photos/'+b.f;
+  document.getElementById('detail-text').textContent =
+    b.n+' —— '+rankCN[b.r]+'品'+(tab==='civil'?'文官':'武官')+'，寓意'+b.m+'。';
+  document.getElementById('badge-detail-overlay').classList.add('on');
+});
+
+function closeBadgeDetail(){
+  document.getElementById('badge-detail-overlay').classList.remove('on');
+}
+
+// ==================== PAGE 6: IDENTITY ====================
+var page6 = document.getElementById('page6');
+var rankInput = document.getElementById('rank-input');
+var rankShow = document.getElementById('rank-show');
+
+page6.querySelector('.id-tab-row').addEventListener('click', function(e){
+  var btn = e.target.closest('.tab-btn');
+  if(!btn) return;
+  idType = btn.dataset.idt;
+  this.querySelectorAll('.tab-btn').forEach(function(b){
+    b.classList.toggle('on', b.dataset.idt === idType);
+  });
+  updatePortrait();
+});
+
+rankInput.addEventListener('input', function(){
+  idRank = parseInt(this.value);
+  rankShow.textContent = rankCN[idRank]+'品';
+  document.getElementById('licheng').style.display = 'none';
+  updatePortrait();
+});
+
+function updatePortrait(){
+  var list = idType === 'civil' ? civilBadges : militaryBadges;
+  var badge = list[idRank-1];
+  document.getElementById('badge-on-chest').innerHTML =
+    '<img src="material/photos/'+badge.f+'" alt="'+badge.n+'" '+
+    'onerror="this.parentElement.innerHTML=\'<span style=font-size:1.5em;opacity:.5>'+badge.n[0]+'</span>\'">';
+  document.getElementById('robe-visual').style.background = robeColors[idRank-1];
+}
+
+function generateOutfit(){
+  var licheng = document.getElementById('licheng');
+  licheng.style.display = 'block';
+  licheng.style.animation = 'none';
+  licheng.offsetHeight;
+  licheng.style.animation = 'titleFadeIn 1s ease-out';
+  updatePortrait();
+}
+
+function resetPortrait(){
+  idRank = 1; idType = 'civil';
+  rankInput.value = 1;
+  rankShow.textContent = '一品';
+  document.getElementById('licheng').style.display = 'none';
+  page6.querySelectorAll('.id-tab-row .tab-btn').forEach(function(b){
+    b.classList.toggle('on', b.dataset.idt === 'civil');
+  });
+  document.getElementById('robe-visual').style.background = robeColors[0];
+  updatePortrait();
+}
+
+// init
+updatePortrait();
+renderBadgeGrid();
+
+// ==================== GLOBAL INPUT ====================
+// Click on page (non-button area) → next page
+document.getElementById('app').addEventListener('click', function(e){
+  if(e.target.closest('button')||e.target.closest('.hotspot')||
+     e.target.closest('.cell')||e.target.closest('.detail-overlay')||
+     e.target.closest('.gate-overlay')||e.target.closest('.tab-btn')||
+     e.target.closest('#page5-tabs')||e.target.closest('.id-tab-row')||
+     e.target.closest('.scroll-wrap')||e.target.closest('input')) return;
+  // Don't advance from page 3 (needs hotspot interaction) unless clicking the bg
+  if(cur===2 && !e.target.closest('#page3')) return;
+  nextPage();
+});
+
+// Mouse wheel
+document.addEventListener('wheel', function(e){
+  // Don't scroll pages on scrollable areas
+  if(e.target.closest('.scroll-wrap')||e.target.closest('#page8')) return;
+  // Don't scroll if detail overlay open
+  if(document.getElementById('badge-detail-overlay').classList.contains('on')) return;
+  e.preventDefault();
+  if(e.deltaY > 20) nextPage();
+  else if(e.deltaY < -20) prevPage();
+}, {passive:false});
+
+// Touch swipe
+var tsY = 0;
+document.addEventListener('touchstart', function(e){ tsY = e.touches[0].clientY; }, {passive:true});
+document.addEventListener('touchend', function(e){
+  if(document.getElementById('badge-detail-overlay').classList.contains('on')) return;
+  if(e.target.closest('.scroll-wrap')||e.target.closest('#page8')) return;
+  var dy = tsY - e.changedTouches[0].clientY;
+  if(Math.abs(dy) > 40){
+    if(dy > 0) nextPage(); else prevPage();
+  }
+});
+
+// Keyboard
+document.addEventListener('keydown', function(e){
+  if(e.key==='ArrowDown'||e.key==='ArrowRight'){ e.preventDefault(); nextPage(); }
+  if(e.key==='ArrowUp'||e.key==='ArrowLeft'){ e.preventDefault(); prevPage(); }
+});
+</script>
+</body>
+</html>
