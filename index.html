@@ -391,8 +391,8 @@
     <h2 class="title-main">观·禽</h2>
     <p class="subtitle">补子里的"动物园"</p>
     <div class="tab-row" id="page5-tabs">
-      <button class="tab-btn on" data-tab="civil">文官·飞禽</button>
-      <button class="tab-btn" data-tab="military">武官·走兽</button>
+      <button class="tab-btn on" id="tab-civil" onclick="switchBadgeTab('civil')">文官·飞禽</button>
+      <button class="tab-btn" id="tab-military" onclick="switchBadgeTab('military')">武官·走兽</button>
     </div>
     <div class="grid" id="badge-grid"></div>
     <p class="narration">这便是"衣冠禽兽"的真相<br>——昔日荣耀的身份徽章。</p>
@@ -409,8 +409,8 @@
     <h2 class="title-main">入·境</h2>
     <p class="subtitle">生成你的大明身份</p>
     <div class="id-tab-row">
-      <button class="tab-btn on" data-idt="civil">文官</button>
-      <button class="tab-btn" data-idt="military">武官</button>
+      <button class="tab-btn on" id="idt-civil" onclick="switchIdentity('civil')">文官</button>
+      <button class="tab-btn" id="idt-military" onclick="switchIdentity('military')">武官</button>
     </div>
     <div class="slider-wrap">
       <p class="rank-txt">品级：<strong id="rank-show">一品</strong></p>
@@ -589,16 +589,12 @@ document.getElementById('robe-wrap').addEventListener('click', function(e){
 });
 
 // ==================== PAGE 5: BADGES ====================
-document.getElementById('page5-tabs').addEventListener('click', function(e){
-  var btn = e.target.closest('.tab-btn');
-  if(!btn) return;
-  var tab = btn.dataset.tab;
+function switchBadgeTab(tab){
   badgeTab = tab;
-  this.querySelectorAll('.tab-btn').forEach(function(b){
-    b.classList.toggle('on', b.dataset.tab === tab);
-  });
+  document.getElementById('tab-civil').classList.toggle('on', tab==='civil');
+  document.getElementById('tab-military').classList.toggle('on', tab==='military');
   renderBadgeGrid();
-});
+}
 
 function renderBadgeGrid(){
   var list = badgeTab === 'civil' ? civilBadges : militaryBadges;
@@ -636,15 +632,12 @@ var page6 = document.getElementById('page6');
 var rankInput = document.getElementById('rank-input');
 var rankShow = document.getElementById('rank-show');
 
-page6.querySelector('.id-tab-row').addEventListener('click', function(e){
-  var btn = e.target.closest('.tab-btn');
-  if(!btn) return;
-  idType = btn.dataset.idt;
-  this.querySelectorAll('.tab-btn').forEach(function(b){
-    b.classList.toggle('on', b.dataset.idt === idType);
-  });
+function switchIdentity(type){
+  idType = type;
+  document.getElementById('idt-civil').classList.toggle('on', type==='civil');
+  document.getElementById('idt-military').classList.toggle('on', type==='military');
   updatePortrait();
-});
+}
 
 rankInput.addEventListener('input', function(){
   idRank = parseInt(this.value);
